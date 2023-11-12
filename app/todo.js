@@ -1,5 +1,5 @@
 import { Stack } from "expo-router";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,33 +9,69 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
-  const [todos, setTodos] = useState([
-    {
-      text: "buy coffee",
-      key: 1,
-    },
-    {
-      text: "Problem Solving",
-      key: 2,
-    },
-    {
-      text: "Create TODO APP",
-      key: 3,
-    },
-    {
-      text: "learning react-native",
-      key: 4,
-    },
-  ]);
+  const [todos, setTodos] = useState([]);
+  const [value, setValue] = useState("");
 
-  const [value, setValue] = useState();
+  // getting data
+  const getTodoData = async () => {
+    try {
+      const todo = JSON.parse((await AsyncStorage.getItem("todoData")) || "[]");
+      setTodos(todo);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const pressHandler = (key) => {
+  useEffect(() => {
+    // AsyncStorage.clear();
+    getTodoData();
+  }, []);
+
+  const uniqueId = () => {
+    var S4 = () => {
+      return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    };
+    return (
+      S4() +
+      S4() +
+      "-" +
+      S4() +
+      "-" +
+      S4() +
+      "-" +
+      S4() +
+      "-" +
+      S4() +
+      S4() +
+      S4()
+    );
+  };
+
+  const pressHandler = async (key) => {
     setTodos((prevState) => {
       return prevState.filter((e) => e.key != key);
     });
+    await AsyncStorage.setItem("todoData", JSON.stringify(todos));
+  };
+
+  const addTodo = async () => {
+    if (value.length === 0) {
+      return alert("Todo yazın!!!!");
+    }
+
+    const newTodo = {
+      text: value,
+      key: uniqueId(),
+    };
+
+    setValue(() => "");
+
+    setTodos((prevTodos) => [newTodo, ...prevTodos]);
+
+    await AsyncStorage.setItem("todoData", JSON.stringify([newTodo, ...todos]));
   };
 
   return (
@@ -55,34 +91,36 @@ export default function App() {
         <TextInput
           placeholder="Task Əlavə Edin"
           style={styles.input}
-          // onKeyPress={(keyPress) => {
-          //   console.log(keyPress);
-          //   if (e.nativeEvent.key == "Enter") {
-          //     // dismissKeyboard();
-          //     dismissKeyboard();
-          //   }
-          // }}
+          value={value}
           multiline={true}
           autoCapitalize="sentences"
           autoCorrect={true}
           keyboardType="default"
           returnKeyType="done"
           onChangeText={(value) => {
-            // todos.unshift({
-            //   text: value,
-            //   key: value.length,
-            // });
+            setValue(value);
           }}
         />
+        <Button title="Add Todos" onPress={addTodo} />
 
         <FlatList
           data={todos}
           keyExtractor={(item) => item.key}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => pressHandler(item.key)}>
-              <Text style={styles.flatlistElement}>
-                {item.text} {item.key}
-              </Text>
+            <TouchableOpacity>
+              <View style={styles.flatlistElement}>
+                <View>
+                  <Text style={styles.todoText}>{item.text}</Text>
+                </View>
+                <View>
+                  <Text
+                    style={styles.actionText}
+                    onPress={() => pressHandler(item.key)}
+                  >
+                    Sil
+                  </Text>
+                </View>
+              </View>
             </TouchableOpacity>
           )}
         />
@@ -99,7 +137,25 @@ const styles = StyleSheet.create({
     borderColor: "teal",
     borderWidth: 1,
     padding: 8,
-    margin: 10,
-    width: 320,
+    marginBottom: 20,
+    width: 352,
+  },
+  actionText: {
+    color: "red",
+  },
+  flatlistElement: {
+    marginTop: 20,
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "center",
+  },
+  todoText: {
+    minWidth: 300,
+    color: "green",
+  },
+  actionText: {
+    backgroundColor: "grey",
+    color: "white",
+    padding: 5,
   },
 });
