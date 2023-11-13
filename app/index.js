@@ -114,6 +114,9 @@ export default function App() {
         <Link href={"/todo"} style={styles.nav}>
           Todo App
         </Link>
+        <Link href={"/fakeUsers"} style={styles.nav}>
+          Users Api
+        </Link>
       </View>
     </View>
   );

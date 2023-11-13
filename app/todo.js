@@ -8,6 +8,8 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -75,57 +77,63 @@ export default function App() {
   };
 
   return (
-    <View>
-      <Stack.Screen
-        options={{
-          title: "ToDo App",
-          headerStyle: { backgroundColor: "#776B5D" },
-          headerTintColor: "#fff",
-          headerTitleStyle: {
-            fontWeight: "bold",
-          },
-        }}
-      />
-
-      <View style={styles.container}>
-        <TextInput
-          placeholder="Task Əlavə Edin"
-          style={styles.input}
-          value={value}
-          multiline={true}
-          autoCapitalize="sentences"
-          autoCorrect={true}
-          keyboardType="default"
-          returnKeyType="done"
-          onChangeText={(value) => {
-            setValue(value);
+    <TouchableWithoutFeedback
+      onPress={() => {
+        Keyboard.dismiss();
+      }}
+    >
+      <View>
+        <Stack.Screen
+          options={{
+            title: "ToDo App",
+            headerStyle: { backgroundColor: "#776B5D" },
+            headerTintColor: "#fff",
+            headerTitleStyle: {
+              fontWeight: "bold",
+            },
           }}
         />
-        <Button title="Add Todos" onPress={addTodo} />
 
-        <FlatList
-          data={todos}
-          keyExtractor={(item) => item.key}
-          renderItem={({ item }) => (
-            <TouchableOpacity>
-              <View style={styles.flatlistElement}>
-                <View>
-                  <Text style={styles.todoText}>{item.text}</Text>
+        <View style={styles.container}>
+          <TextInput
+            placeholder="Task Əlavə Edin"
+            style={styles.input}
+            value={value}
+            multiline={true}
+            autoCapitalize="sentences"
+            autoCorrect={true}
+            keyboardType="default"
+            returnKeyType="done"
+            onChangeText={(value) => {
+              setValue(value);
+            }}
+          />
+          <Button title="Add Todos" onPress={addTodo} />
+
+          <FlatList
+            data={todos}
+            keyExtractor={(item) => item.key}
+            renderItem={({ item }) => (
+              <TouchableOpacity>
+                <View style={styles.flatlistElement}>
+                  <View>
+                    <Text style={styles.todoText}>{item.text}</Text>
+                  </View>
+                  <View>
+                    <Text
+                      style={styles.actionText}
+                      onPress={() => pressHandler(item.key)}
+                    >
+                      Sil
+                    </Text>
+                  </View>
                 </View>
-                <View>
-                  <Text
-                    style={styles.actionText}
-                    onPress={() => pressHandler(item.key)}
-                  >
-                    Sil
-                  </Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+              </TouchableOpacity>
+            )}
+          />
+        </View>
       </View>
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 
