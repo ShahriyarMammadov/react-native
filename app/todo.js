@@ -31,6 +31,7 @@ export default function App() {
     // AsyncStorage.clear();
     getTodoData();
   }, []);
+  const date = new Date();
 
   const uniqueId = () => {
     var S4 = () => {
@@ -67,6 +68,7 @@ export default function App() {
     const newTodo = {
       text: value,
       key: uniqueId(),
+      date: date.toISOString(),
     };
 
     setValue(() => "");
@@ -116,8 +118,14 @@ export default function App() {
             renderItem={({ item }) => (
               <TouchableOpacity>
                 <View style={styles.flatlistElement}>
-                  <View>
+                  <View style={styles.todos}>
                     <Text style={styles.todoText}>{item.text}</Text>
+                    <Text style={styles.todoText}>
+                      {item?.date
+                        ?.slice(0, 19)
+                        ?.replaceAll("-", ":")
+                        .replaceAll("T", "/")}
+                    </Text>
                   </View>
                   <View>
                     <Text
@@ -148,22 +156,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: 352,
   },
-  actionText: {
-    color: "red",
-  },
   flatlistElement: {
     marginTop: 20,
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: "column",
   },
   todoText: {
     minWidth: 300,
     color: "green",
   },
+  todos: {
+    backgroundColor: "yellow",
+    padding: 20,
+  },
   actionText: {
     backgroundColor: "grey",
     color: "white",
-    padding: 5,
+    textAlign: "center",
+    padding: 15,
+    fontSize: 15,
+    fontWeight: "bold",
   },
 });
