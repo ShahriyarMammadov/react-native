@@ -17,7 +17,7 @@ export default function App() {
   const [todos, setTodos] = useState([]);
   const [value, setValue] = useState("");
 
-  // getting data
+  // getting data 
   const getTodoData = async () => {
     try {
       const todo = JSON.parse((await AsyncStorage.getItem("todoData")) || "[]");
